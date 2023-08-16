@@ -61,3 +61,6 @@ void ModifyContact(Con* pc);
 
 //销毁通讯录
 void DestroyContact(Con* pc);
+
+//保存数据
+void SaveContact(Con* pc);

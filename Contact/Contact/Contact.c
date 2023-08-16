@@ -10,6 +10,22 @@
 //	memset(pc->date, 0, pc->capacity * sizeof(Peo));
 //}
 
+void IncreaseContact(Con* pc)
+{
+	if (pc->capacity == pc->count)
+	{
+		Peo* ptr = (Peo*)realloc(pc->date, (DEFAULT_SZ + INC_SZ) * sizeof(Peo));
+		if (ptr == NULL)
+		{
+			printf("AddContact::%s\n", strerror(errno));
+			return;
+		}
+		pc->date = ptr;
+		pc->capacity += INC_SZ;
+		printf("增容成功\n");
+	}
+}
+
 //动态的版本
 void InitContact(Con* pc)
 {
@@ -23,6 +39,23 @@ void InitContact(Con* pc)
 		return;
 	}
 	pc->capacity = DEFAULT_SZ;
+
+	FILE* pf = fopen("contact.txt", "rb");
+	if (pf == NULL)
+	{
+		printf("%s\n", strerror(errno));
+		return;
+	}
+
+	Peo tmp = { 0 };
+
+	while (fread(&tmp, sizeof(Peo), 1, pf) == 1)
+	{
+		IncreaseContact(pc);
+		pc->date[pc->count] = tmp;
+		pc->count++;
+	}
+	
 }
 
 //静态的版本
@@ -53,22 +86,6 @@ void InitContact(Con* pc)
 //
 //	pc->count++;
 //}
-
-void IncreaseContact(Con* pc)
-{
-	if (pc->capacity == pc->count)
-	{
-		Peo* ptr = (Peo*)realloc(pc->date, (DEFAULT_SZ + INC_SZ) * sizeof(Peo));
-		if (ptr == NULL)
-		{
-			printf("AddContact::%s\n", strerror(errno));
-			return;
-		}
-		pc->date = ptr;
-		pc->capacity += INC_SZ;
-		printf("增容成功\n");
-	}
-}
 
 //动态的版本
 void AddContact(Con* pc)
@@ -214,6 +231,24 @@ void ModifyContact(Con* pc)
 	}
 
 }
+
+void SaveContact(Con* pc)
+{
+	FILE* pf = fopen("contact.txt", "wb");
+	if (pf == NULL)
+	{
+		printf("%s\n", strerror(errno));
+		return;
+	}
+	int i = 0;
+	for (i = 0; i < pc->count; i++)
+	{
+		fwrite(&(pc->date[i]), sizeof(Peo), 1, pf);
+	}
+	fclose(pf);
+	pf = NULL;
+}
+
 void DestroyContact(Con* pc)
 {
 	assert(pc);

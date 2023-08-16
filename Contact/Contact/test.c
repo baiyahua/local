@@ -36,6 +36,7 @@ int main()
 		case 6:ModifyContact(&con);
 			break;
 		case 0:
+			SaveContact(&con);
 			DestroyContact(&con);
 			printf("рямкЁЖ\n");
 			break;
